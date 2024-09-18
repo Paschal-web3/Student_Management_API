@@ -1,26 +1,128 @@
 const {Students} = require ('../model/Students')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-exports.addStudent = async (req, res) => {
-    try {
-        const student = await Students.create(req.body)
-        res.status(201).json({
-            message: "Student added successfully", 
-            data: student})
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    } 
-    // Add many insert many students 
 
+exports.Register = async (req, res) => {
     try {
-        const students = await Students.insertMany(req.body)
+        // Destructure required fields from the request body
+        let { FullName, PhoneNumber, Email, Password } = req.body;
+
+        // Check if all required fields are provided
+        if (!FullName || !PhoneNumber || !Email || !Password) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "All fields are required: FullName, PhoneNumber, Email, and Password must be provided."
+            });
+        }
+
+        // Check if a user with the given email already exists
+        const UserVerification = await Students.findOne({ Email });
+        if (UserVerification) {
+            return res.status(400).json({
+                status: 400, // Added status code for consistency
+                success: false,
+                message: "User already exists"
+            });
+        }
+
+        // Hash the password using bcrypt
+        const hashPassword = await bcrypt.hash(Password, 10); // Use bcrypt.hash instead of hashSync for better practice
+
+        // Create a new user with the provided data
+        const user = await Students.create({
+            FullName, // Correctly match the variable name
+            PhoneNumber,
+            Email,
+            Password: hashPassword // Store hashed password
+        });
+
+        // Create the JWT payload
+        const Payload = {
+            id: user._id,
+            FullName: user.FullName, // Ensure the key matches the model field
+        };
+
+        // Sign the JWT token with the payload and secret key
+        const token = jwt.sign(Payload, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+        // Respond with the success message, user data, and token
         res.status(201).json({
-            message: "Students added successfully",
-            data: students})
+            status: 201, // Added status code for consistency
+            success: true,
+            message: "Congratulations! Your account has been successfully created.",
+            data: user,
+            token
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        // Handle server errors
+        res.status(500).json({
+            status: 500, // Added status code for consistency
+            success: false,
+            message: "We’re having trouble completing your registration. Please try again",
+            error: error.message
+        });
+    }
+};
+
+
+// Creating the student login function 
+exports.Login = async (req, res)=>{
+    try {
+        let { Email, Password } = req.body;
+        // Check if all required fields are provided
+        if (!Email || !Password) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "All fields are required: Email and Password must be provided. ⚠️"
+            });
+        }
+
+        const user = await Students.findOne({ Email });
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "User not found ⚠️"
+            });
+        }
+
+        const comparePassword = bcrypt.compareSync(Password, user.Password);
+        if (!comparePassword){
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "Incorrect Password ⚠️"
+            });
+        }
+        const payload = {
+            id: user._id,
+            FullName: user.FullName,
+        };
+        const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' });
+        res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Login successful",
+            data: user,
+            token
+        });
+
+    }
+    catch (error){
+        res.status(500).json({
+            status: 500,
+            success: false,
+            message: "We’re currently experiencing technical difficulties. Please try logging in again later.",
+            error: error.message
+        });
     }
 }
+
+
 
 exports.getStudents = async (req, res) => {
     try {
@@ -43,7 +145,7 @@ exports.getStudentById = async (req, res) => {
 
 //Update students 
 
-    exports.updateStudent = async (req, res) => {
+exports.updateStudent = async (req, res) => {
     try {
         const updatedStudent = await Students.findByIdAndUpdate(req.params.id, req.body, {new: true})
         res.json(updatedStudent)

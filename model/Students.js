@@ -15,11 +15,11 @@ const Students = new mongoose.Schema({
   },
   Date_of_Birth: {
     type: Date,
-    required: true,
+    required: false,
   },
   Gender: {
     type: String,
-    required: true,
+    required: false,
   },
   PhoneNumber: {
     type: Number,
@@ -27,24 +27,27 @@ const Students = new mongoose.Schema({
   },
   Country: {
     type: String,
-    required: true,
+    required: false,
   },
   State: {
     type: String,
-    required: true,
+    required: false,
   },
   LGA: {
     type: String,
-    required: true,
+    required: false,
   },
   Address: {
     type: String,
-    required: true,
+    required: false,
   }, 
   Course:[{
-    course: {type: mongoose.Schema.Types.ObjectId, ref: "Courses" }, // referencing Courses collection by CourseID
-    score: {type: String, required: true, min: 1, max:100}
-  }]
-  
+    course: {type: mongoose.Schema.Types.ObjectId, ref: "Courses" , required: false}, // referencing Courses collection by CourseID
+    score: {type: String, required: true, min: 1, max:100, required: false}
+  }],
+  Password: {
+    type: String,
+    required: true,
+  }	
 },{timestamps: true});;
 exports.Students = new mongoose.model("Students", Students);

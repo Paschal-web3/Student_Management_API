@@ -20,6 +20,11 @@ const instructor = new mongoose.Schema({
   Gender: {
     type: String,
     required: false,
+  },
+  Position:{
+    type: String,
+    enum: ["Lecturer", "Admin"] ,default: "Lecturer",
+    required: true,
   }
 });
 
