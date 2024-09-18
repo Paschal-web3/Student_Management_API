@@ -45,11 +45,18 @@ exports.login =async (req, res)=>{
     let { Email, Password} = req.body
     const user = await Instructor.findOne({ Email})
     if (!user) {
-        return res.status(401).json({ message: "Invalid email" })
+        return res.status(401).json({
+            status: 400,
+            success: false,
+            message: "All fields are required: Incorrect Email. ⚠️" })
     }
     const validPassword = await bcrypt.compare(Password, user.Password)
     if (!validPassword) {
-        return res.status(401).json({ message: "Invalid password" })
+        return res.status(401).json({ 
+                status: 400,
+                success: false,
+                message: "All fields are required: Invalid Password. ⚠️"
+        })
     }
     const Payload = {
         id: user._id,
