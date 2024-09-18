@@ -9,13 +9,13 @@ const instructor = new mongoose.Schema({
   },
   Email: {
     type: String,
-    required: false,
+    required: true,
     minlength: 3,
     maxlength: 100,
   },
   PhoneNumber: {
     type: Number,
-    required: true,
+    required: false,
   },
   Gender: {
     type: String,
@@ -23,7 +23,11 @@ const instructor = new mongoose.Schema({
   },
   Position:{
     type: String,
-    enum: ["Lecturer", "Admin"] ,default: "Lecturer",
+    enum: ["Lecturer", "Admin", "Dean", "HOD"] ,default: "Lecturer",
+    required: true,
+  },
+  Password:{
+    type: String,
     required: true,
   }
 });

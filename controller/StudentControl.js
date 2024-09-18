@@ -146,12 +146,21 @@ exports.getStudentById = async (req, res) => {
 //Update students 
 
 exports.updateStudent = async (req, res) => {
-    try {
-        const updatedStudent = await Students.findByIdAndUpdate(req.params.id, req.body, {new: true})
-        res.json(updatedStudent)
-    } catch (error) {
-        res.status(500).json({ message: error.message })
+  try {
+    const students = await Students.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    if (req.body.Password){
+        const hashedPassword = await bcrypt.hash(req.body.Password, 10);
+        students.Password = hashedPassword;
     }
+    students.save()
+    
+    res.status(200).json({
+        message: "Student updated successfully",
+        data: students,
+    })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
 }
 
 
