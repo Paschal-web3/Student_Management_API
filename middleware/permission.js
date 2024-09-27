@@ -1,18 +1,17 @@
-const PermissionMiddleware = (AdminRole)=>{
-    
-    return (req, res, next)=>{
-        try {
-          const user = req.user.Position
-          if (AdminRole.includes(user)){
+exports.PermissionMiddleware = (AdminRole)=>{
+    return (req, res, next) =>{
+
+        const userRole = req.user.Position 
+        // Check if user has admin role. If not, return an error message and stop the function execution.
+        if (AdminRole.includes(userRole)){
             next()
-          }  
-          return res.status(403).json({
-            status: 403,
-            success: false,
-            message: "You are not authorized to perform this action."
-          })
-        } catch (error) {
-            console.log(error)
+        }
+        else{
+            res.status(403).json({
+                success:false,
+                status:403,
+                message:"You do not have permission to access this resource" 
+            })
         }
     }
 }

@@ -20,6 +20,10 @@ const GradeSchema = new mongoose.Schema({
         min: 0,
         max: 100
     },
+    Grade:{
+        type: String,
+        required: true,
+    }
 
 })
 

@@ -18,14 +18,21 @@ const getGrade = (score) => {
 
 exports.addGrade = async (req, res) => {
     try {
-        const addGrade = await Grade.create(req.body) 
-        const addGrade = new Grade{
-            
-        }       
+        const Grade = await Grade.create(req.body)
+        await populate('studentName', "Courses","Instructor")
+
+        const grade = new Grade({
+            studentName: Grade.studentName,
+            Courses: Grade.Courses,
+            Instructors: Grade.Instructors,
+            Score: Grade.Score,
+            Grade: getGrade(Grade.Score) 
+        })      
         res.status(201).json({
             message: "Grade added successfully",
-            data: addGrade
+            data: grade
         })
+
     } catch (error) {
         res.status(500).json({
             message: "Error adding grade",
