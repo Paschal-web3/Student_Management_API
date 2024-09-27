@@ -148,6 +148,7 @@ exports.updateInstructor = async (req, res)=>{
             updateInstructor.Password = hashedPassword
         }
         updateInstructor.save()
+        
         res.status(200).json({
             message: "Instructor updated successfully",
             data: updateInstructor
