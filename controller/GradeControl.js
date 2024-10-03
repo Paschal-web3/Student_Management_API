@@ -1,36 +1,22 @@
 
-const Grade = require('../model/Grade')
+const {GradeSchema} = require('../model/Grade')
+const scoreCalculator = require ('../Utility/gradeFunction')
 
-
-const getGrade = (score) => {
-    if (score >= 70) {
-        return 'A';
-    } else if (score >= 60) {
-        return 'B';
-    } else if (score >= 50) {
-        return 'C';
-    } else if (score >= 48) {
-        return 'D';
-    } else {
-        return 'F';
-    }
-};
 
 exports.addGrade = async (req, res) => {
     try {
-        const Grade = await Grade.create(req.body)
-        await populate('studentName', "Courses","Instructor")
-
-        const grade = new Grade({
-            studentName: Grade.studentName,
-            Courses: Grade.Courses,
-            Instructors: Grade.Instructors,
-            Score: Grade.Score,
-            Grade: getGrade(Grade.Score) 
-        })      
+        const Grades = await GradeSchema.create(req.body)
+        if (Grades){
+            res.status(200).json({
+                message: "Grade added successfully",
+                data: Grades,
+                grade: scoreCalculator(Grades.score)
+            })
+        }
+        await Grades.save()
         res.status(201).json({
             message: "Grade added successfully",
-            data: grade
+            data: Grades
         })
 
     } catch (error) {
@@ -43,13 +29,20 @@ exports.addGrade = async (req, res) => {
 
 exports.getGrade = async (req, res) => {
     try {
-        const getGrade = new Grade({
-            studentName: req.body.populate('studentName'),
-            Courses: req.body.populate(" Course"),
-            Instructors: req.body.populate("Instructors")
+        const grade = await GradeSchema.find()
+        .populate({path:'studentName', select: "FullName"})
+        .populate({ path:'Instructor', select: "FullName"})
+        .populate({path:'Courses', select: "CourseCode"})
+
+        grade.grade = scoreCalculator(grade.score)
+        res.status(200).json({
+            message: "Grades retrieved successfully",
+            data: grade
         })
-        res.status(200).json({message: "Grade added successfully", data: getGrade})
     } catch (error) {
-        
+        res.status(500).json({
+            message: "Error retrieving grades",
+            error: error.message
+        })
     }
 }

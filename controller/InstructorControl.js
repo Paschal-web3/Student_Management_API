@@ -48,14 +48,14 @@ exports.login =async (req, res)=>{
         return res.status(401).json({
             status: 400,
             success: false,
-            message: "All fields are required: Incorrect Email. ⚠️" })
+            message: "User not found" })
     }
     const validPassword = await bcrypt.compare(Password, user.Password)
     if (!validPassword) {
         return res.status(401).json({ 
                 status: 400,
                 success: false,
-                message: "All fields are required: Invalid Password. ⚠️"
+                message: "Invalid Password. ⚠️"
         })
     }
     const Payload = {

@@ -1,7 +1,7 @@
 const express = require ( 'express')
 const route = express.Router()
 const instructorController = require("../controller/InstructorControl")
-
+const {PermissionMiddleware} = require('../middleware/permission')
 //Middleware
 const Auth = require('../middleware/Auth')
 
@@ -10,12 +10,12 @@ route.post('/lecturer/register', instructorController.Register)
 
 //Login Lecturer
 
-route.post('/lecturer/login', instructorController.login)
+route.post('/lecturer/login', PermissionMiddleware("Lecturer"),instructorController.login)
 
 
 //Create a new Instructor
-route.post('/addTutor', instructorController.addInstructor)
-route.get('/getTutor', Auth, instructorController.getInstructors)
+route.post('/addTutor',Auth, instructorController.addInstructor)
+route.get('/getTutor', instructorController.getInstructors)
 route.get('/getTutor/:id', Auth, instructorController.getInstructorById)
 route.put('/updateTutor/:id',Auth, instructorController.updateInstructor)
 route.delete('/getTutor/:id',Auth, instructorController.deleteInstructor)

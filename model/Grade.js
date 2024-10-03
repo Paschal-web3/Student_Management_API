@@ -22,7 +22,7 @@ const GradeSchema = new mongoose.Schema({
     },
     Grade:{
         type: String,
-        required: true,
+        required: false,
     }
 
 })
