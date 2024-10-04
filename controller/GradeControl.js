@@ -34,10 +34,17 @@ exports.getGrade = async (req, res) => {
         .populate({ path:'Instructor', select: "FullName"})
         .populate({path:'Courses', select: "CourseCode"})
 
-        grade.grade = scoreCalculator(grade.score)
+        const grades = new grade({
+            studentName: grade.studentName,
+            Courses: grade.course,
+            Instructor: grade.Instructor,
+            Score: grade.Score,
+            Grade: scoreCalculator(grade.score)
+        })
+
         res.status(200).json({
             message: "Grades retrieved successfully",
-            data: grade
+            data: grades
         })
     } catch (error) {
         res.status(500).json({
