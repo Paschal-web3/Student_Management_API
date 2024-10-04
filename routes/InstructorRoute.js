@@ -1,7 +1,7 @@
 const express = require ( 'express')
 const route = express.Router()
 const instructorController = require("../controller/InstructorControl")
-const {PermissionMiddleware} = require('../middleware/permission')
+
 //Middleware
 const Auth = require('../middleware/Auth')
 
@@ -10,7 +10,7 @@ route.post('/lecturer/register', instructorController.Register)
 
 //Login Lecturer
 
-route.post('/lecturer/login', PermissionMiddleware("Lecturer"),instructorController.login)
+route.post('/lecturer/login',instructorController.login)
 
 
 //Create a new Instructor

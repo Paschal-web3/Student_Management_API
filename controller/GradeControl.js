@@ -31,15 +31,29 @@ exports.addGrade = async (req, res) => {
 }
 exports.getGrade = async (req, res) => {
     try {
-        const grade = await GradeSchema.find()
-        .populate({path:'studentName', select: "FullName"})
-        .populate({ path:'Instructor', select: "FullName"})
-        .populate({path:'Courses', select: "CourseCode"})
+        // const grade = await GradeSchema.find()
+        // .populate({path:'studentName', select: "FullName -_id"})
+        // .populate({ path:'Instructor', select: "FullName -_id"})
+        // .populate({path:'Courses', select: "CourseCode - _id"})
 
+        const grade = await GradeSchema.find()
+        .populate({ path: 'studentName', select: 'FullName -_id' })  // Exclude _id, include FullName
+        .populate({ path: 'Instructor', select: 'FullName -_id' })   // Exclude _id, include FullName
+        .populate({ path: 'Courses', select: 'CourseCode -_id' });   // Exclude _id, include CourseCode
+
+        const realGrade = grade.map(grade=>({
+            studentName: grade.studentName.FullName,
+            Instructor: grade.Instructor.FullName,
+            CourseCode: grade.Courses.CourseCode,
+            Score: grade.Score,
+            Grade: scoreCalculator(grade.Score)
+        }))
         res.status(200).json({
             message: "Grades retrieved successfully",
-            data: grade
+            data: realGrade
         })
+
+
     } catch (error) {
         res.status(500).json({
             message: "Error retrieving grades",

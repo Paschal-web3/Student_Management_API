@@ -4,11 +4,11 @@ const route = require('express').Router()
 
 
 // Middleware
-const {PermissionMiddleware} = require('../middleware/permission')
+
 const auth = require('../middleware/Auth')
 
 // register student
-route.post ('/Register', auth,PermissionMiddleware("Admin"), StudentController.Register)
+route.post ('/Register', auth, StudentController.Register)
 //login student
 route.post ('/Login', StudentController.Login)
 //get all students

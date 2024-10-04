@@ -1,5 +1,5 @@
 const jwt = require ("jsonwebtoken")
-require('dotenv').config
+require('dotenv').config()
 
 // Middleware to validate JWT token
 const verifyToken = (req, res, next) => {
@@ -19,7 +19,10 @@ const verifyToken = (req, res, next) => {
         const VerifyToken = jwt.verify(token,process.env.SECRET_KEY )
         req.user = VerifyToken
 
-        next()
+        if (req.user.Position === "Admin"){
+            // Only allow admin to access this route
+            next()
+        }
 
     } catch (error) {
         res.status(403).json({
