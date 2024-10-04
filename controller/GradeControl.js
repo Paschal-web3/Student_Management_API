@@ -5,28 +5,30 @@ const scoreCalculator = require ('../Utility/gradeFunction')
 
 exports.addGrade = async (req, res) => {
     try {
+
+        //.Create creates and saves in the databasr directly, so we need to modify the score and the function before creating 
+
+        req.body.Grade = scoreCalculator(req.body.Score)
+
+        //Now we can now create. Here the Grade is having the Score calculated and returned value (Wonderful)
         const Grades = await GradeSchema.create(req.body)
+
         if (Grades){
             res.status(200).json({
                 message: "Grade added successfully",
-                data: Grades,
-                grade: scoreCalculator(Grades.score)
             })
         }
-        await Grades.save()
-        res.status(201).json({
-            message: "Grade added successfully",
-            data: Grades
+        res.status(200).json({
+            message: "Here is the grade of the student",
+            Details: Grades
         })
-
-    } catch (error) {
+    }catch(error){
         res.status(500).json({
-            message: "Error adding grade",
-            error: error.message
+            message: "Error creating the Grade",
+            responseFromServer: error
         })
     }
 }
-
 exports.getGrade = async (req, res) => {
     try {
         const grade = await GradeSchema.find()
